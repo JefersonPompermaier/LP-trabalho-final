@@ -1,0 +1,10 @@
+2 + 3
+5 * 4
+true && false
+true || false
+(2 + 3) * 4
+10 + 20
+3 * 7
+false && true
+false || true
+(5 * 2) + 3
