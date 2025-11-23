@@ -20,6 +20,9 @@ data Token = TokenNum Int
            | TokenColon       -- Adicionado (:)
            | TokenBoolean     -- Adicionado (Tipo Bool)
            | TokenNumber      -- Adicionado (Tipo Num)
+           | TokenComma       -- Novo: para separar elementos da tupla
+           | TokenFst         -- Novo: função fst
+           | TokenSnd         -- Novo: função snd
            deriving Show
 
 -- Mantive a definição de Expr e Ty como estavam, pois estão corretas
@@ -35,11 +38,15 @@ data Expr = Num Int
           | Var String
           | Lam String Ty Expr
           | App Expr Expr
+          | Pair Expr Expr  -- Novo: Construtor de Par (e1, e2)
+          | Fst Expr        -- Novo: Projeção 1
+          | Snd Expr        -- Novo: Projeção 2
           deriving Show
 
 data Ty = TNum
         | TBool
         | TFun Ty Ty
+        | TPair Ty Ty       -- Novo: Tipo Produto (T1, T2)
         deriving (Show, Eq)
 
 lexer :: String -> [Token]
@@ -53,6 +60,7 @@ lexer ('|':'|':cs) = TokenOr : lexer cs
 lexer (':':cs) = TokenColon : lexer cs           -- Lê :
 lexer ('\\':cs) = TokenLam : lexer cs            -- Lê \
 lexer ('-':'>':cs) = TokenArrow : lexer cs       -- Lê ->
+lexer (',':cs) = TokenComma : lexer cs           -- Lê vírgula
 lexer (c:cs) | isSpace c = lexer cs
              | isDigit c = lexNum (c:cs)
              | isAlpha c = lexKw (c:cs)
@@ -69,4 +77,6 @@ lexKw cs = case span isAlpha cs of
              ("else", rest)  -> TokenElse : lexer rest
              ("Bool", rest)  -> TokenBoolean : lexer rest
              ("Num", rest)   -> TokenNumber : lexer rest
+             ("fst", rest)   -> TokenFst : lexer rest     -- Lê keyword fst
+             ("snd", rest)   -> TokenSnd : lexer rest     -- Lê keyword snd
              (var, rest)     -> TokenVar var : lexer rest -- Lê variáveis genéricas

@@ -37,6 +37,7 @@ import Lexer
 %left '+'
 %left '*'
 %left APP
+%left fst snd
 
 %% 
 
@@ -51,10 +52,14 @@ Exp     : num           { Num $1 }
         | if Exp then Exp else Exp      { If $2 $4 $6 }
         | '\\' var ':' Type "->" Exp    { Lam $3 $5 }
         | Exp Exp %prec APP             { App $1 $2 }
-        | '(' Exp ')'   { Paren $2 }
+        | '(' Exp ')'                   { Paren $2 }
+        | fst Exp                       { Fst $2 }
+        | snd Exp                       { Snd $2 }
+        | '(' Exp ')'                   { Paren $2 }
 
 Type    : Bool                          { TBool }
         | Num                           { TNum }
+        | '(' Type ',' Type ')'         { TPair $2 $4 } -- Tipo Tupla
         | Type "->" Type                { TFun $1 $3 }
         | '(' Type ')'                  { $2 }
 

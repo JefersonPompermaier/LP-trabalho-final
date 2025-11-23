@@ -8,7 +8,8 @@ isValue BTrue  = True
 isValue BFalse = True 
 isValue (Num _) = True 
 isValue (Lam _ _ _) = True 
-isValue _ = False 
+isValue (Pair e1 e2) = isValue e1 && isValue e2
+isValue _ = False
 
 subst :: String -> Expr -> Expr -> Expr 
 subst x s y@(Var v) = if x == v then 
@@ -26,6 +27,10 @@ subst x s (Times t1 t2) = Times (subst x s t1) (subst x s t2)
 subst x s (Or t1 t2) = Or (subst x s t1) (subst x s t2)
 subst x s (If t1 t2 t3) = If (subst x s t1) (subst x s t2) (subst x s t3)
 subst x s (Paren t1) = Paren (subst x s t1)
+-- Substituição em Tuplas
+subst x s (Pair e1 e2) = Pair (subst x s e1) (subst x s e2)
+subst x s (Fst e) = Fst (subst x s e)
+subst x s (Snd e) = Snd (subst x s e)
 
 
 step :: Expr -> Expr 
@@ -56,6 +61,20 @@ step (App (Lam x tp e1) e2) = if (isValue e2) then
                                 subst x e2 e1 
                               else 
                                 App (Lam x tp e1) (step e2)
+
+step (App e1 e2) = App (step e1) e2
+
+-- Avaliação de Tuplas
+step (Pair e1 e2) | not (isValue e1) = Pair (step e1) e2
+                  | not (isValue e2) = Pair e1 (step e2)
+
+step (Fst (Pair v1 v2)) | isValue v1 && isValue v2 = v1
+step (Fst e) = Fst (step e)
+
+step (Snd (Pair v1 v2)) | isValue v1 && isValue v2 = v2
+step (Snd e) = Snd (step e)
+
+step e = error ("Stuck at: " ++ show e)
 
 eval :: Expr -> Expr
 eval e = if isValue e then 
