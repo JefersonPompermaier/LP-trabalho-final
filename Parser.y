@@ -30,6 +30,9 @@ import Lexer
     ':'             { TokenColon }
     Bool            { TokenBoolean }
     Num             { TokenNumber }
+    ','             { TokenComma }
+    fst             { TokenFst }
+    snd             { TokenSnd }
 
 %nonassoc if then else '\\' "->"
 %left "||"
@@ -50,11 +53,11 @@ Exp     : num           { Num $1 }
         | Exp "&&" Exp  { And $1 $3 }
         | Exp "||" Exp  { Or $1 $3 }
         | if Exp then Exp else Exp      { If $2 $4 $6 }
-        | '\\' var ':' Type "->" Exp    { Lam $3 $5 }
+        | '\\' var ':' Type "->" Exp    { Lam $2 $4 $6 }
         | Exp Exp %prec APP             { App $1 $2 }
-        | '(' Exp ')'                   { Paren $2 }
         | fst Exp                       { Fst $2 }
         | snd Exp                       { Snd $2 }
+        | '(' Exp ',' Exp ')'           { Pair $2 $4 }
         | '(' Exp ')'                   { Paren $2 }
 
 Type    : Bool                          { TBool }
