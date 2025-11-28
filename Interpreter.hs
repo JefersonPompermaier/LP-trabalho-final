@@ -27,7 +27,7 @@ subst x s (Times t1 t2) = Times (subst x s t1) (subst x s t2)
 subst x s (Or t1 t2) = Or (subst x s t1) (subst x s t2)
 subst x s (If t1 t2 t3) = If (subst x s t1) (subst x s t2) (subst x s t3)
 subst x s (Paren t1) = Paren (subst x s t1)
--- Substituição em Tuplas
+-- Substituição em tuplas
 subst x s (Pair e1 e2) = Pair (subst x s e1) (subst x s e2)
 subst x s (Fst e) = Fst (subst x s e)
 subst x s (Snd e) = Snd (subst x s e)
@@ -55,7 +55,7 @@ step (If BTrue e2 e3) = e2
 step (If BFalse e2 e3) = e3
 step (If e1 e2 e3) = If (step e1) e2 e3
 
-step (Paren e1) = step e1
+step (Paren e1) = e1
 
 step (App (Lam x tp e1) e2) = if (isValue e2) then 
                                 subst x e2 e1 
@@ -64,7 +64,7 @@ step (App (Lam x tp e1) e2) = if (isValue e2) then
 
 step (App e1 e2) = App (step e1) e2
 
--- Avaliação de Tuplas
+-- Avaliação de tuplas
 step (Pair e1 e2) | not (isValue e1) = Pair (step e1) e2
                   | not (isValue e2) = Pair e1 (step e2)
 

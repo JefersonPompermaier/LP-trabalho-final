@@ -11,21 +11,20 @@ data Token = TokenNum Int
            | TokenOr 
            | TokenLParen 
            | TokenRParen 
-           | TokenIf          -- Adicionado
-           | TokenThen        -- Adicionado
-           | TokenElse        -- Adicionado
-           | TokenVar String  -- Adicionado para variáveis
-           | TokenLam         -- Adicionado (\)
-           | TokenArrow       -- Adicionado (->)
-           | TokenColon       -- Adicionado (:)
-           | TokenBoolean     -- Adicionado (Tipo Bool)
-           | TokenNumber      -- Adicionado (Tipo Num)
-           | TokenComma       -- Novo: para separar elementos da tupla
-           | TokenFst         -- Novo: função fst
-           | TokenSnd         -- Novo: função snd
+           | TokenIf         
+           | TokenThen        
+           | TokenElse       
+           | TokenVar String 
+           | TokenLam        
+           | TokenArrow      
+           | TokenColon      
+           | TokenBoolean    
+           | TokenNumber     
+           | TokenComma      
+           | TokenFst        
+           | TokenSnd        
            deriving Show
 
--- Mantive a definição de Expr e Ty como estavam, pois estão corretas
 data Expr = Num Int
           | BTrue
           | BFalse
@@ -38,15 +37,15 @@ data Expr = Num Int
           | Var String
           | Lam String Ty Expr
           | App Expr Expr
-          | Pair Expr Expr  -- Novo: Construtor de Par (e1, e2)
-          | Fst Expr        -- Novo: Projeção 1
-          | Snd Expr        -- Novo: Projeção 2
+          | Pair Expr Expr 
+          | Fst Expr        
+          | Snd Expr        
           deriving Show
 
 data Ty = TNum
         | TBool
         | TFun Ty Ty
-        | TPair Ty Ty       -- Novo: Tipo Produto (T1, T2)
+        | TPair Ty Ty      
         deriving (Show, Eq)
 
 lexer :: String -> [Token]
@@ -57,10 +56,10 @@ lexer ('(':cs) = TokenLParen : lexer cs
 lexer (')':cs) = TokenRParen : lexer cs
 lexer ('&':'&':cs) = TokenAnd : lexer cs
 lexer ('|':'|':cs) = TokenOr : lexer cs
-lexer (':':cs) = TokenColon : lexer cs           -- Lê :
-lexer ('\\':cs) = TokenLam : lexer cs            -- Lê \
-lexer ('-':'>':cs) = TokenArrow : lexer cs       -- Lê ->
-lexer (',':cs) = TokenComma : lexer cs           -- Lê vírgula
+lexer (':':cs) = TokenColon : lexer cs          
+lexer ('\\':cs) = TokenLam : lexer cs            
+lexer ('-':'>':cs) = TokenArrow : lexer cs      
+lexer (',':cs) = TokenComma : lexer cs          
 lexer (c:cs) | isSpace c = lexer cs
              | isDigit c = lexNum (c:cs)
              | isAlpha c = lexKw (c:cs)
@@ -77,6 +76,6 @@ lexKw cs = case span isAlpha cs of
              ("else", rest)  -> TokenElse : lexer rest
              ("Bool", rest)  -> TokenBoolean : lexer rest
              ("Num", rest)   -> TokenNumber : lexer rest
-             ("fst", rest)   -> TokenFst : lexer rest     -- Lê keyword fst
-             ("snd", rest)   -> TokenSnd : lexer rest     -- Lê keyword snd
-             (var, rest)     -> TokenVar var : lexer rest -- Lê variáveis genéricas
+             ("fst", rest)   -> TokenFst : lexer rest     
+             ("snd", rest)   -> TokenSnd : lexer rest     
+             (var, rest)     -> TokenVar var : lexer rest
